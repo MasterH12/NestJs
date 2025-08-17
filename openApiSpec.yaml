@@ -1,0 +1,91 @@
+openapi: 3.0.0
+
+info:
+  title: API Nest Js
+  description: Api para cursos de Nest Js
+  version: "1.0.0"
+  license: MIT
+
+servers:
+    - url: http://localhost:3000
+      description: Servidor de desarrollo
+
+components:
+  schemas:
+    User:
+      type: object
+      propoerties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Juan Perez
+        email:
+          type: string
+          example: juan.perez@email.com
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Users
+    description: Operaciones relacionadas con usuarios
+
+paths:
+  /users:
+    get:
+      summary: lista de usuarios
+      description: Devuelve todos los usuarios del sistema
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+    post:
+      summary: Crea un usuario
+      description: Crea un usuario
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+              properties:
+                name:
+                  type: string
+                  example: Juan Perez
+                email
+                  type: string
+                  format: email
+                  example: juan.perez@email.com
+        responses:
+          '201':
+            description: Usuario creado
+            content:
+              Application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+          '400':
+            description: Datos inválidos
+
+
+
+
+
