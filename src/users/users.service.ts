@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { createUserDto, updateUserDto } from './user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,14 +12,16 @@ export class UsersService {
   ) {}
 
   async findAll() {
-    return await this.usersRepository.find({});
+    return await this.usersRepository.find({
+      relations: ['profile']
+    });
   }
 
   async findOne(requestedId: number) {
     return await this.findIfExists(requestedId);
   }
 
-  async create(data: createUserDto) {
+  async create(data: CreateUserDto) {
     try{
       const newUser = await this.usersRepository.save(data);
       return newUser;
@@ -37,14 +39,17 @@ export class UsersService {
     };
   }
 
-  async update(requestedId: number, changes: updateUserDto) {
+  async update(requestedId: number, changes: UpdateUserDto) {
     const user  = await this.findIfExists(requestedId);
     const modifiedUser = await this.usersRepository.merge( user, changes );
     return await this.usersRepository.save(modifiedUser);
   }
 
   private async findIfExists(requestedId: number) {
-    const user = await this.usersRepository.findOneBy({id: requestedId});
+    const user = await this.usersRepository.findOne({
+      where: { id: requestedId },
+      relations: [ 'profile' ],
+    });
     if (!user) {
       throw new NotFoundException(`Error, usuario con id ${requestedId} no existe`);
     }
