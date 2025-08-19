@@ -1,5 +1,6 @@
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn, JoinTable } from "typeorm"
+
 import { User } from "src/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import { Category } from "./category.entity";
 
 @Entity({
@@ -36,9 +37,13 @@ export class Post {
     @JoinColumn({ name: 'user_id' })
     user: User
 
-    /*
-    @ManyToMany( () => Category, (category) => category.posts, { nullable: false })
-    @JoinColumn({ name: 'user_id' })
+    
+    @ManyToMany( () => Category, (category) => category.posts)
+    @JoinTable({ 
+        name: 'posts_categories',
+        joinColumn: { name: 'post_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' }
+    })
     categories: Category[];
-    */
+    
 }

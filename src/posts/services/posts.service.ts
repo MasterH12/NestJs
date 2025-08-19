@@ -13,7 +13,9 @@ export class PostsService {
   ) { }
 
   async findAll() {
-    return await this.postsRepository.find({relations:['user.profile']});
+    return await this.postsRepository.find({
+      relations:['user.profile', 'categories' ],
+    });
   }
 
   async findOne(requestedId: number) {
@@ -25,6 +27,7 @@ export class PostsService {
       const newPost = await this.postsRepository.save({
         ...data,
         user: {id: data.userId },
+        categories: data.categoryIds?.map((id) => ({id}))
       });
       return await this.findIfExists(newPost.id);
     } catch (error) {
@@ -50,7 +53,7 @@ export class PostsService {
   private async findIfExists(requestedId: number) {
     const post = await this.postsRepository.findOne({
       where: { id: requestedId },
-      relations: ['user.profile'],
+      relations: [ 'user.profile', 'categories' ],
     });
     if (!post) {
       throw new NotFoundException(`Error, post con id ${requestedId} no existe`);
