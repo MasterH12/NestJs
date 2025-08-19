@@ -16,9 +16,17 @@ export class Profile {
     @Column({ type: 'varchar', length: 255, unique: true })
     avatar: string;
 
-    @CreateDateColumn({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', name: 'created_at'})
+    @CreateDateColumn({
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        name: 'created_at'
+    })
     createdAt: Date;
 
-    @UpdateDateColumn({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', name: 'udpated_at'})
+    @UpdateDateColumn({
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        name: 'udpated_at'
+    })
     updatedAt: Date;
 }

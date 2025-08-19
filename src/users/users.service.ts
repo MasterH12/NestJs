@@ -1,64 +1,52 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { createUserDto, updateUserDto } from './user.dto';
-import { User } from './user.model';
+import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [
-    {
-      id: 1,
-      name: 'Alexander',
-      email: 'heinzosesrunge@gmail.com',
-    },
-    {
-      id: 2,
-      name: 'Joachim',
-      email: 'yoaoses@gmail.com',
-    },
-  ];
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-  findAll() {
-    return this.users;
+  async findAll() {
+    return await this.usersRepository.find({});
   }
 
-  findOne(requestedId: number) {
-    const position = this.findPosition(requestedId);
-    return this.users[position];
+  async findOne(requestedId: number) {
+    return await this.findIfExists(requestedId);
   }
 
-  create(data: createUserDto) {
-    const newUser = {
-      ...data,
-      id: this.users.length + 1,
-    };
-    this.users.push(newUser);
-    return newUser;
+  async create(data: createUserDto) {
+    try{
+      const newUser = await this.usersRepository.save(data);
+      return newUser;
+    } catch (error){
+      throw new BadRequestException('Error creating user');
+    }
+    
   }
 
-  deleteUser(requestedId: number) {
-    this.users.splice(this.findPosition(requestedId), 1);
+  async deleteUser(requestedId: number) {
+    this.usersRepository.delete({id: requestedId});
     return {
       message: 'User Deleted',
     };
   }
 
-  update(requestedId: number, changes: updateUserDto) {
-    const position = this.findPosition(requestedId);
-    const modifiedUser = {
-      ...this.users[position],
-      ...changes,
-    };
-    this.users[position] = modifiedUser;
-
-    return modifiedUser;
+  async update(requestedId: number, changes: updateUserDto) {
+    const user  = await this.findIfExists(requestedId);
+    const modifiedUser = await this.usersRepository.merge( user, changes );
+    return await this.usersRepository.save(modifiedUser);
   }
 
-  private findPosition(requestedId: number) {
-    const position = this.users.findIndex((user) => user.id === Number(requestedId));
-    console.log('position: ', position);
-    if (position === -1) {
+  private async findIfExists(requestedId: number) {
+    const user = await this.usersRepository.findOneBy({id: requestedId});
+    if (!user) {
       throw new NotFoundException(`Error, usuario con id ${requestedId} no existe`);
     }
-    return position;
+    return user;
   }
 }
