@@ -1,4 +1,5 @@
 PORT = 3000
+ENV = production
 
 POSTGRES_HOST = localhost
 POSTGRES_PORT = localhost

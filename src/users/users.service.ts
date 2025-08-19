@@ -24,6 +24,7 @@ export class UsersService {
       const newUser = await this.usersRepository.save(data);
       return newUser;
     } catch (error){
+      console.log("Error: ", error);
       throw new BadRequestException('Error creating user');
     }
     

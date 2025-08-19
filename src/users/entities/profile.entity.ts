@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    PrimaryGeneratedColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
+    OneToOne,
+    JoinColumn
+} from "typeorm";
 
 @Entity({
     name:'profiles',
@@ -12,9 +20,6 @@ export class Profile {
 
     @Column({ type: 'varchar', length: 128 })
     role: string;
-
-    @Column({ type: 'varchar', length: 255, unique: true })
-    avatar: string;
 
     @CreateDateColumn({
         type: 'timestamptz',

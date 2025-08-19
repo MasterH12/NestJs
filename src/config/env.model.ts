@@ -1,5 +1,6 @@
 export interface Env {
   PORT: number;
+  ENV: string;
   POSTGRES_HOST: string;
   POSTGRES_PORT: number;
   POSTGRES_DB: string;
