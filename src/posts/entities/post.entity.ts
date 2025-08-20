@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn, JoinTable } from "typeorm"
 
-import { User } from "src/users/entities/user.entity";
+import { User } from "../../users/entities/user.entity";
 import { Category } from "./category.entity";
 
 @Entity({

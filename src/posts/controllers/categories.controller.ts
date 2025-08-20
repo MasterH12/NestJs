@@ -1,11 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+
 import { CategoriesService } from '../services/categories.service';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { PostsService } from '../services/posts.service';
 
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(
+    private readonly categoriesService: CategoriesService,
+    private readonly postsService: PostsService,
+  ) {}
 
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
@@ -20,6 +25,11 @@ export class CategoriesController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: string) {
     return this.categoriesService.findOne(+id);
+  }
+
+  @Get(':id/posts')
+  findPostsByCategoryId(@Param('id', ParseIntPipe) id: string) {
+    return this.postsService.findPostsByCategoryId(+id);
   }
 
   @Patch(':id')

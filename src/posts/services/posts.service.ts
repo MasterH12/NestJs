@@ -50,6 +50,14 @@ export class PostsService {
     return await this.postsRepository.save(modifiedPost);
   }
 
+  async findPostsByCategoryId(categoryId: number){
+
+    return await this.postsRepository.find({
+      where: {categories: { id: categoryId }},
+      relations: ['user.profile'],
+    })
+  }
+
   private async findIfExists(requestedId: number) {
     const post = await this.postsRepository.findOne({
       where: { id: requestedId },
