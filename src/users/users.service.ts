@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -23,7 +24,8 @@ export class UsersService {
 
   async create(data: CreateUserDto) {
     try{
-      const newUser = await this.usersRepository.save(data);
+      const createdUser = await this.usersRepository.create(data);
+      const newUser = await this.usersRepository.save(createdUser);
       return newUser;
     } catch (error){
       console.log("Error: ", error);
@@ -54,5 +56,9 @@ export class UsersService {
       throw new NotFoundException(`Error, usuario con id ${requestedId} no existe`);
     }
     return user;
+  }
+
+  async getUserByEmail(requestedEmail : string){
+    return this.usersRepository.findOne({where: {email: requestedEmail}})
   }
 }

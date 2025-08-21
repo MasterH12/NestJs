@@ -6,8 +6,11 @@ import {
     UpdateDateColumn,
     OneToOne,
     JoinColumn,
-    OneToMany
+    OneToMany,
+    BeforeInsert
 } from "typeorm";
+import * as bcrypt from 'bcrypt';
+import { Exclude } from "class-transformer";
 
 import { Profile } from './profile.entity';
 import { Post } from "../../posts/entities/post.entity";
@@ -26,6 +29,11 @@ export class User {
     })
     email: string;
 
+    @BeforeInsert()
+    async hashPassword(){
+        this.password = await bcrypt.hash(this.password, 10);
+    }
+    @Exclude()
     @Column()
     password: string;
 

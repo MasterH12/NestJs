@@ -9,6 +9,6 @@ import { Profile } from './entities/profile.entity';
   imports: [TypeOrmModule.forFeature([User, Profile])],
   controllers: [UsersController],
   providers: [UsersService],
-  //exports: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}
