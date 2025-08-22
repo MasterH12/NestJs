@@ -1,15 +1,18 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { OpenaiService } from 'src/ai/services/openai.service';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { Post } from '../entities/post.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
+    private openaiService: OpenaiService,
   ) { }
 
   async findAll() {
@@ -22,11 +25,11 @@ export class PostsService {
     return await this.findIfExists(requestedId);
   }
 
-  async create(data: CreatePostDto) {
+  async create(data: CreatePostDto, userId: number) {
     try {
       const newPost = await this.postsRepository.save({
         ...data,
-        user: {id: data.userId },
+        user: {id: userId },
         categories: data.categoryIds?.map((id) => ({id}))
       });
       return await this.findIfExists(newPost.id);
@@ -67,5 +70,24 @@ export class PostsService {
       throw new NotFoundException(`Error, post con id ${requestedId} no existe`);
     }
     return post;
+  }
+
+  async publish(postId: number, userId: number){
+    const post = await this.findIfExists( postId );
+    if(post.user.id !== userId){
+      throw new ForbiddenException("You are not allowed to publish this post");
+    }
+    if(!post.content || !post.title || post.categories.length === 0){
+      throw new BadRequestException("Post content, title and at least one category are required");
+    }
+    const summary = await this.openaiService.generateSummary(post.content);
+    //const image = await this.openaiService.generateImage(summary);
+    const changes = this.postsRepository.merge(post,{
+      published: true,
+      content: summary
+    });
+
+    const updatedPost = await this.postsRepository.save(changes);
+    return updatedPost;
   }
 }

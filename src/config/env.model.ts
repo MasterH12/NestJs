@@ -7,4 +7,5 @@ export interface Env {
   POSTGRES_DB: string;
   POSTGRES_USERNAME: string;
   POSTGRES_PASSWORD: string;
+  OPEN_API_KEY: string;
 }
